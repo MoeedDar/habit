@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Measure {
+  Boolean
+  Number
+}
+
+enum Day {
+  Monday
+  Tuesday
+  Wednesday
+  Thursday
+  Friday
+  Saturday
+  Sunday
+  Everyday
+}
+
+model User {
+  id       String @unique
+  trackers Tracker[]
+}
+
+model Tracker {
+  name    String
+  user    User @relation(fields: [userId], references: [id])
+  userId  String
+  data    TrackerData[]
+  measure Measure
+  goal    Float
+  streak  Int
+  days    Day[]
+  remind  DateTime
+
+  @@unique([name, userId])
+}
+
+model TrackerData {
+  date  DateTime
+  value Float @default(0)
+  tracker Tracker @relation(fields: [trackerName, userId], references: [name, userId])
+  trackerName String
+  userId String
+
+  @@unique([date, userId, trackerName])
+}
